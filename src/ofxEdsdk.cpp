@@ -376,6 +376,16 @@ namespace ofxEdsdk {
         
         if(needToTakePhoto) {
             try {
+                
+                EdsUInt32 saveTo = kEdsSaveTo_Host;
+                EdsSetPropertyData(camera, kEdsPropID_SaveTo, 0, sizeof(saveTo), &saveTo);
+                
+                EdsCapacity maxCapacity = {0x7FFFFFFF, 0x1000, 1};
+                EdsSetCapacity(camera, maxCapacity );
+                
+                //                cout << "ping" << endl;
+                
+                
                 Eds::SendCommand(camera, kEdsCameraCommand_TakePicture, 0);
                 lock();
                 needToTakePhoto = false;
