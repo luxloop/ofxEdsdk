@@ -20,6 +20,47 @@ namespace Eds {
         
         return dirItemInfo;
 	}
+    
+    EdsDirectoryItemInfo DownloadImageNoCard(EdsDirectoryItemRef directoryItem, ofBuffer& imageBuffer, bool deleteAfterDownload) {
+        EdsStreamRef stream = NULL;
+        EdsDirectoryItemInfo dirItemInfo;
+        Eds::GetDirectoryItemInfo(directoryItem, &dirItemInfo);
+        //*
+        Eds::CreateMemoryStream(0, &stream);
+        Eds::Download(directoryItem, dirItemInfo.size, stream);
+        Eds::DownloadComplete(directoryItem);
+        Eds::CopyStream(stream, imageBuffer);
+        //*/
+        if(deleteAfterDownload) {
+            Eds::DeleteDirectoryItem(directoryItem);
+        }
+        Eds::SafeRelease(stream);
+        
+        return dirItemInfo;
+    }
+    
+//    EdsDirectoryItemInfo transferImage(EdsBaseRef object, ofBuffer& imageBuffer, bool deleteAfterDownload){
+//        
+//        EdsStreamRef stream = NULL;
+//        EdsDirectoryItemRef PictureFromCamBuffer = object;
+//        EdsDirectoryItemInfo dirItemInfo;
+//        
+//        EdsGetDirectoryItemInfo(PictureFromCamBuffer, &dirItemInfo);
+//        
+//        //Create Outputfile(s)
+//        EdsCreateFileStream(dirItemInfo.szFileName, kEdsFileCreateDisposition_CreateAlways, kEdsAccess_ReadWrite, &stream);
+//        
+//        EdsDownload( PictureFromCamBuffer, dirItemInfo.size, stream);
+//        EdsDownloadComplete(PictureFromCamBuffer);
+//        
+//        // Release stream
+//        if (stream != NULL) {
+//            EdsRelease(stream);
+//            stream = NULL;
+//        }
+//        
+//        return dirItemInfo;
+//    }
 	
 	// from EDSDK API sample 6.3.10
 	void StartLiveview(EdsCameraRef camera) {

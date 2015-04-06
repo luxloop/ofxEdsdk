@@ -25,8 +25,10 @@ namespace ofxEdsdk {
         ofLogVerbose() << "object event " << Eds::getObjectEventString(event);
         cout << "object event " << Eds::getObjectEventString(event) << endl;
         if(object) {
-            if(event == kEdsObjectEvent_DirItemCreated || event == kEdsObjectEvent_DirItemRequestTransfer) {
+            if(event == kEdsObjectEvent_DirItemCreated) {
                 ((Camera*) context)->setDownloadImage(object);
+            } else if(event == kEdsObjectEvent_DirItemRequestTransfer) {
+                ((Camera*) context)->setDownloadImageNoCard(object);
             } else if(event == kEdsObjectEvent_DirItemRemoved) {
                 // no need to release a removed item
             } else {
@@ -76,6 +78,7 @@ namespace ofxEdsdk {
     photoDataReady(false),
     needToSendKeepAlive(false),
     needToDownloadImage(false),
+    needToDownloadImageNoCard(false),
     resetIntervalMinutes(15) {
         liveBufferMiddle.resize(OFX_EDSDK_BUFFER_SIZE);
         for(int i = 0; i < liveBufferMiddle.maxSize(); i++) {
@@ -289,6 +292,13 @@ namespace ofxEdsdk {
         unlock();
     }
     
+    void Camera::setDownloadImageNoCard(EdsDirectoryItemRef directoryItem) {
+        lock();
+        this->directoryItem = directoryItem;
+        needToDownloadImageNoCard = true;
+        unlock();
+    }
+    
     void Camera::setSendKeepAlive() {
         lock();
         needToSendKeepAlive = true;
@@ -386,7 +396,7 @@ namespace ofxEdsdk {
                 EdsCapacity maxCapacity = {0x7FFFFFFF, 0x1000, 1};
                 EdsSetCapacity(camera, maxCapacity );
                 
-                //                cout << "ping" << endl;
+                //cout << "ping" << endl;///////////////////////////////////////////////////
                 
                 
                 Eds::SendCommand(camera, kEdsCameraCommand_TakePicture, 0);
@@ -452,6 +462,28 @@ namespace ofxEdsdk {
                     photoNew = true;
                 } else if (dirItemInfo.format == OFX_EDSDK_MOV_FORMAT) {
                     movieNew = true;
+                }
+                
+                unlock();
+            } catch (Eds::Exception& e) {
+                ofLogError() << "Error while downloading item: " << e.what();
+            }
+        }
+        
+        if(needToDownloadImageNoCard) {
+            try {
+                EdsDirectoryItemInfo dirItemInfo = Eds::DownloadImageNoCard(directoryItem, photoBuffer);
+                cout << dirItemInfo.format << endl;
+                lock();
+                photoDataReady = true;
+                needToDecodePhoto = true;
+                needToUpdatePhoto = true;
+                needToDownloadImageNoCard = false;
+                
+                if (dirItemInfo.format == OFX_EDSDK_JPG_FORMAT) {
+                    photoNew = true;
+                } else if (dirItemInfo.format == 45315){
+                    
                 }
                 
                 unlock();

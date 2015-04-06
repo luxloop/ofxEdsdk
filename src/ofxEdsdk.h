@@ -95,6 +95,7 @@ namespace ofxEdsdk {
 		bool photoDataReady; // Photo data has been downloaded at least once.
 		bool needToSendKeepAlive; // Send keepalive next chance we get.
 		bool needToDownloadImage; // Download image next chance we get.
+        bool needToDownloadImageNoCard; // Download image next chance we get FROM CAMERA BUFFER.
         
         bool movieNew;
         bool needToStartRecording; // threadedFunction() should start recording next chance it gets.
@@ -113,6 +114,7 @@ namespace ofxEdsdk {
 		
 		void setLiveViewReady(bool liveViewReady);
 		void setDownloadImage(EdsDirectoryItemRef directoryItem);
+        void setDownloadImageNoCard(EdsDirectoryItemRef directoryItem);
 		void setSendKeepAlive();
 		
 		EdsDirectoryItemRef directoryItem;
