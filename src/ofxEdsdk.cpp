@@ -293,10 +293,14 @@ namespace ofxEdsdk {
     }
     
     void Camera::setDownloadImageNoCard(EdsDirectoryItemRef directoryItem) {
-        lock();
-        this->directoryItem = directoryItem;
-        needToDownloadImageNoCard = true;
-        unlock();
+        if (Eds::getFileType(directoryItem) == OFX_EDSDK_JPG_FORMAT) {
+            lock();
+            this->directoryItem = directoryItem;
+            needToDownloadImageNoCard = true;
+            unlock();
+        } else {
+            Eds::DownloadCancel(directoryItem);
+        }
     }
     
     void Camera::setSendKeepAlive() {
@@ -473,7 +477,7 @@ namespace ofxEdsdk {
         if(needToDownloadImageNoCard) {
             try {
                 EdsDirectoryItemInfo dirItemInfo = Eds::DownloadImageNoCard(directoryItem, photoBuffer);
-                cout << dirItemInfo.format << endl;
+                cout << dirItemInfo.szFileName << endl;
                 lock();
                 photoDataReady = true;
                 needToDecodePhoto = true;

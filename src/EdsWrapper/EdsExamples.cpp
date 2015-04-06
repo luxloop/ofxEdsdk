@@ -39,6 +39,12 @@ namespace Eds {
         return dirItemInfo;
     }
     
+    int getFileType(EdsDirectoryItemRef directoryItem) {
+        EdsDirectoryItemInfo dirItemInfo;
+        Eds::GetDirectoryItemInfo(directoryItem, &dirItemInfo);
+        return dirItemInfo.format;
+    }
+    
 //    EdsDirectoryItemInfo transferImage(EdsBaseRef object, ofBuffer& imageBuffer, bool deleteAfterDownload){
 //        
 //        EdsStreamRef stream = NULL;
