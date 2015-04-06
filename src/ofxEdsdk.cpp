@@ -23,8 +23,9 @@ namespace ofxEdsdk {
     
     EdsError EDSCALLBACK Camera::handleObjectEvent(EdsObjectEvent event, EdsBaseRef object, EdsVoid* context) {
         ofLogVerbose() << "object event " << Eds::getObjectEventString(event);
+        cout << "object event " << Eds::getObjectEventString(event) << endl;
         if(object) {
-            if(event == kEdsObjectEvent_DirItemCreated) {
+            if(event == kEdsObjectEvent_DirItemCreated || event == kEdsObjectEvent_DirItemRequestTransfer) {
                 ((Camera*) context)->setDownloadImage(object);
             } else if(event == kEdsObjectEvent_DirItemRemoved) {
                 // no need to release a removed item
@@ -41,6 +42,7 @@ namespace ofxEdsdk {
     
     EdsError EDSCALLBACK Camera::handlePropertyEvent(EdsPropertyEvent event, EdsPropertyID propertyId, EdsUInt32 param, EdsVoid* context) {
         ofLogVerbose() << "property event " << Eds::getPropertyEventString(event) << ": " << Eds::getPropertyIDString(propertyId) << " / " << param;
+        //cout  << "property event " << Eds::getPropertyEventString(event) << ": " << Eds::getPropertyIDString(propertyId) << " / " << param << endl;
         if(propertyId == kEdsPropID_Evf_OutputDevice) {
             ((Camera*) context)->setLiveViewReady(true);
         }
@@ -49,6 +51,7 @@ namespace ofxEdsdk {
     
     EdsError EDSCALLBACK Camera::handleCameraStateEvent(EdsStateEvent event, EdsUInt32 param, EdsVoid* context) {
         ofLogVerbose() << "camera state event " << Eds::getStateEventString(event) << ": " << param;
+        //cout << "camera state event " << Eds::getStateEventString(event) << ": " << param << endl;
         if(event == kEdsStateEvent_WillSoonShutDown) {
             ((Camera*) context)->setSendKeepAlive();
         }
