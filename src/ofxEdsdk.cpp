@@ -417,8 +417,10 @@ namespace ofxEdsdk {
                 lock();
                 needToTakePhoto = false;
                 unlock();
+                //ofSendMessage("test");
             } catch (Eds::Exception& e) {
                 ofLogError() << "Error while taking a picture: " << e.what();
+                //ofSendMessage("Error: " + ofToString(e.what()));
             }
         }
         
