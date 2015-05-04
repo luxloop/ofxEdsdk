@@ -31,6 +31,8 @@ namespace ofxEdsdk {
 		ofTexture& getLiveTexture();
 		float getFrameRate();
         float getBandwidth();
+        void shootWithNoCard(bool noCard);
+        bool getShootNoCardStatus();
         
 		void takePhoto(bool blocking = false);
 		bool isPhotoNew();
@@ -121,5 +123,6 @@ namespace ofxEdsdk {
         
         int deviceId;
         int orientationMode;
+        bool shootNoCard;
 	};
 }

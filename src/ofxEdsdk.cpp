@@ -75,6 +75,7 @@ namespace ofxEdsdk {
     photoDataReady(false),
     needToSendKeepAlive(false),
     needToDownloadImage(false),
+    shootNoCard(false),
     resetIntervalMinutes(15) {
         liveBufferMiddle.resize(OFX_EDSDK_BUFFER_SIZE);
         for(int i = 0; i < liveBufferMiddle.maxSize(); i++) {
@@ -182,6 +183,14 @@ namespace ofxEdsdk {
         float bandwidth = bytesPerFrame * fps.getFrameRate();
         unlock();
         return bandwidth;
+    }
+    
+    void Camera::shootWithNoCard(bool noCard){
+        shootNoCard = noCard;
+    }
+    
+    bool Camera::getShootNoCardStatus(){
+        return shootNoCard;
     }
     
     void Camera::takePhoto(bool blocking) {
@@ -295,6 +304,8 @@ namespace ofxEdsdk {
             needToDownloadImage = true;
             unlock();
         } else {
+            // Do something with the RAW image
+            // Right now, I'm ignoring it and deleting from camera buffer
             Eds::DownloadCancel(directoryItem);
         }
     }
@@ -390,13 +401,16 @@ namespace ofxEdsdk {
         if(needToTakePhoto) {
             try {
                 
-                EdsUInt32 saveTo = kEdsSaveTo_Host;
-                EdsSetPropertyData(camera, kEdsPropID_SaveTo, 0, sizeof(saveTo), &saveTo);
-                
-                EdsCapacity maxCapacity = {0x7FFFFFFF, 0x1000, 1};
-                EdsSetCapacity(camera, maxCapacity );
-                
-                //cout << "ping" << endl;///////////////////////////////////////////////////
+                if (shootNoCard) {
+                    EdsUInt32 saveTo = kEdsSaveTo_Host;
+                    EdsSetPropertyData(camera, kEdsPropID_SaveTo, 0, sizeof(saveTo), &saveTo);
+                    
+                    EdsCapacity maxCapacity = {0x7FFFFFFF, 0x1000, 1};
+                    EdsSetCapacity(camera, maxCapacity );
+                } else {
+                    EdsUInt32 saveTo = kEdsSaveTo_Camera;
+                    EdsSetPropertyData(camera, kEdsPropID_SaveTo, 0, sizeof(saveTo), &saveTo);
+                }
                 
                 
                 Eds::SendCommand(camera, kEdsCameraCommand_TakePicture, 0);

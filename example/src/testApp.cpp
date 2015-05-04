@@ -37,7 +37,12 @@ void testApp::draw() {
         status << camera.getWidth() << "x" << camera.getHeight() << " @ " <<
 			(int) ofGetFrameRate() << " app-fps / " <<
 			(int) camera.getFrameRate() << " cam-fps / " <<
-            (camera.getBandwidth() / (1<<20)) << " MiB/s";
+            (camera.getBandwidth() / (1<<20)) << " MiB/s / Save photos to: ";
+        if (camera.getShootNoCardStatus()) {
+            status << "host";
+        } else {
+            status << "card";
+        }
 		ofDrawBitmapString(status.str(), 10, 20);
 	}
 }
@@ -45,6 +50,10 @@ void testApp::draw() {
 void testApp::keyPressed(int key) {
 	if(key == ' ') {
 		camera.takePhoto();
+    }
+    if (key == 'h') {
+        //toggle host/card saving of pictures
+        camera.shootWithNoCard(!camera.getShootNoCardStatus());
     }
     if(key == 's') {
         camera.setup();
