@@ -293,7 +293,11 @@ namespace ofxEdsdk {
     void Camera::setDownloadImage(EdsDirectoryItemRef directoryItem) {
         lock();
         this->directoryItem = directoryItem;
-        needToDownloadImage = true;
+//        cout << "Looking: " << Eds::getFileType(directoryItem) << endl;
+        if (Eds::getFileType(directoryItem) != 45316) {
+            needToDownloadImage = true;
+        }
+        //needToDownloadImage = true;
         unlock();
     }
     
